@@ -105,7 +105,7 @@ void outputData(void *src, int size, const char *outputfilename)
 		exit (2);
 	}
 
-        cutilSafeCall( cudaMemcpy( tempData_h, src, size, cudaMemcpyDeviceToHost) );
+        checkCudaErrors( cudaMemcpy( tempData_h, src, size, cudaMemcpyDeviceToHost) );
 //      copy data from GPU to CPU
 
         FILE *fp;

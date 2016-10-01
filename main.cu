@@ -58,7 +58,8 @@ c******************************************************************/
 #include "convolution.cu"
  
 // includes, project
-#include <cutil_inline.h>
+#include <helper_cuda.h>
+#include <helper_timer.h>
 #include <cublas.h>
 #include <thrust/device_ptr.h>
 #include <thrust/reduce.h>
@@ -105,6 +106,7 @@ int main( int argc, char** argv)
 //      choose which device to use
 
         cudaGetDeviceCount(&deviceCount);
+	cout<<"Device count: "<<deviceCount<<endl;
         cudaGetDeviceProperties(&dP,device);
         cout<<"Max threads per block: "<<dP.maxThreadsPerBlock<<endl;
         cout<<"Max Threads DIM: "<<dP.maxThreadsDim[0]<<" x "<<dP.maxThreadsDim[1]<<" x "<<dP.maxThreadsDim[2]<<endl;
@@ -122,9 +124,10 @@ int main( int argc, char** argv)
         cout << "****************************************" << endl << endl;
 
 //	mark the start total time timer 
-	unsigned int totalTimer = 0;
-    	cutilCheckError( cutCreateTimer( &totalTimer));
-    	cutilCheckError( cutStartTimer( totalTimer));
+	//unsigned int totalTimer = 0;
+	StopWatchInterface *totalTimer = NULL;
+    	sdkCreateTimer( &totalTimer);
+    	sdkStartTimer( &totalTimer);
 
 /******************************************************
 	initialize
@@ -154,9 +157,10 @@ int main( int argc, char** argv)
 /******************************************************
 	start iterations
 ******************************************************/
-	unsigned int timer = 0;
-        cutilCheckError( cutCreateTimer( &timer));
-        cutilCheckError( cutStartTimer( timer));
+	//unsigned int timer = 0;
+	StopWatchInterface *timer = NULL;
+        sdkCreateTimer( &timer);
+        sdkStartTimer( &timer);
 //      mark the start time
 
         cout << "\n\n";
@@ -194,11 +198,11 @@ int main( int argc, char** argv)
 	
 
 	cudaThreadSynchronize();
-	cutilCheckError( cutStopTimer( timer));
+	sdkStopTimer( &timer);
         printf("\n\n****************************************\n");
-        printf( "Computing time: %f (ms)\n", cutGetTimerValue( timer));
+        printf( "Computing time: %f (ms)\n", sdkGetTimerValue( &timer));
         printf("****************************************\n\n\n");
-        cutilCheckError( cutDeleteTimer( timer));
+        sdkDeleteTimer( &timer);
 //      mark the end timer and print
 
 /******************************************************
@@ -224,11 +228,11 @@ int main( int argc, char** argv)
 
 
 //	mark the end total timer
-	cutilCheckError( cutStopTimer( totalTimer));
+	sdkStopTimer( &totalTimer);
 	printf("\n\n****************************************\n");
-    	printf( "Entire program time: %f (ms)\n", cutGetTimerValue( totalTimer));
+    	printf( "Entire program time: %f (ms)\n", sdkGetTimerValue( &totalTimer));
     	printf("****************************************\n\n\n");
-	cutilCheckError( cutDeleteTimer( totalTimer));
+	sdkDeleteTimer( &totalTimer);
 
 
 	printf("Have a nice day!\n");
@@ -239,7 +243,8 @@ int main( int argc, char** argv)
 
 
 
-    	cutilExit(argc, argv);
+    	//cutilExit(argc, argv);
+    	exit(0);
 	return 0;
 
 

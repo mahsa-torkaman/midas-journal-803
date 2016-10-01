@@ -144,56 +144,56 @@ void compute(float *d_im_move, float *d_im_static, float *d_mv_x, float *d_mv_y,
 //	bind moving image to texture	
 	const cudaExtent volumeSize = make_cudaExtent(NX, NY, NZ);    	
 	cudaChannelFormatDesc channelDesc = cudaCreateChannelDesc<float>();
-	cutilSafeCall( cudaMalloc3DArray(&d_im_move_array, &channelDesc, volumeSize) );
+	checkCudaErrors( cudaMalloc3DArray(&d_im_move_array, &channelDesc, volumeSize) );
     	cudaMemcpy3DParms copyParams = {0};
     	copyParams.srcPtr   = make_cudaPitchedPtr((void*)d_im_move, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     	copyParams.dstArray = d_im_move_array;
     	copyParams.extent   = volumeSize;
     	copyParams.kind     = cudaMemcpyDeviceToDevice;
-    	cutilSafeCall( cudaMemcpy3D(&copyParams) );
+    	checkCudaErrors( cudaMemcpy3D(&copyParams) );
 
 
 	d_im_move_tex.normalized = false;                
     	d_im_move_tex.filterMode = cudaFilterModeLinear;  
 
     
-    	cutilSafeCall(cudaBindTextureToArray(d_im_move_tex, d_im_move_array, channelDesc));
+    	checkCudaErrors(cudaBindTextureToArray(d_im_move_tex, d_im_move_array, channelDesc));
 
 
 // 	bind vector flows to texture
-	cutilSafeCall( cudaMalloc3DArray(&d_mv_x_array, &channelDesc, volumeSize) );
+	checkCudaErrors( cudaMalloc3DArray(&d_mv_x_array, &channelDesc, volumeSize) );
 	cudaMemcpy3DParms copyParams_x = {0};
     	copyParams_x.srcPtr   = make_cudaPitchedPtr((void*)d_mv_x, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     	copyParams_x.dstArray = d_mv_x_array;
     	copyParams_x.extent   = volumeSize;
     	copyParams_x.kind     = cudaMemcpyDeviceToDevice;
-    	cutilSafeCall( cudaMemcpy3D(&copyParams_x) );
+    	checkCudaErrors( cudaMemcpy3D(&copyParams_x) );
 	d_mv_x_tex.normalized = false;
 	d_mv_x_tex.filterMode = cudaFilterModeLinear;
 
 
-	cutilSafeCall( cudaMalloc3DArray(&d_mv_y_array, &channelDesc, volumeSize) );
+	checkCudaErrors( cudaMalloc3DArray(&d_mv_y_array, &channelDesc, volumeSize) );
 	cudaMemcpy3DParms copyParams_y = {0};
     	copyParams_y.srcPtr   = make_cudaPitchedPtr((void*)d_mv_y, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     	copyParams_y.dstArray = d_mv_y_array;
     	copyParams_y.extent   = volumeSize;
     	copyParams_y.kind     = cudaMemcpyDeviceToDevice;
-    	cutilSafeCall( cudaMemcpy3D(&copyParams_y) );
+    	checkCudaErrors( cudaMemcpy3D(&copyParams_y) );
 	d_mv_y_tex.normalized = false;
 	d_mv_y_tex.filterMode = cudaFilterModeLinear;
 
-	cutilSafeCall( cudaMalloc3DArray(&d_mv_z_array, &channelDesc, volumeSize) );
+	checkCudaErrors( cudaMalloc3DArray(&d_mv_z_array, &channelDesc, volumeSize) );
 	cudaMemcpy3DParms copyParams_z = {0};
     	copyParams_z.srcPtr   = make_cudaPitchedPtr((void*)d_mv_z, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     	copyParams_z.dstArray = d_mv_z_array;
     	copyParams_z.extent   = volumeSize;
     	copyParams_z.kind     = cudaMemcpyDeviceToDevice;
-    	cutilSafeCall( cudaMemcpy3D(&copyParams_z) );
+    	checkCudaErrors( cudaMemcpy3D(&copyParams_z) );
 	d_mv_z_tex.normalized = false;
 	d_mv_z_tex.filterMode = cudaFilterModeLinear;
 	
 	float *d_im_out;
-	cutilSafeCall( cudaMalloc((void **)&d_im_out, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_im_out, sDATA_SIZE) );
 
 
 
@@ -201,12 +201,12 @@ void compute(float *d_im_move, float *d_im_static, float *d_mv_x, float *d_mv_y,
 	float *d_v_x, *d_v_x_copy;
 	float *d_v_y, *d_v_y_copy;
 	float *d_v_z, *d_v_z_copy;
-	cutilSafeCall( cudaMalloc((void **)&d_v_x, sDATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_v_y, sDATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_v_z, sDATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_v_x_copy, sDATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_v_y_copy, sDATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_v_z_copy, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_x, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_y, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_z, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_x_copy, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_y_copy, sDATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_v_z_copy, sDATA_SIZE) );
 
 
 //	setup for computing joint histogram via thrust
@@ -343,8 +343,8 @@ void compute(float *d_im_move, float *d_im_static, float *d_mv_x, float *d_mv_y,
     			copyParams.dstArray = d_im_move_array;
     			copyParams.extent   = volumeSize;
     			copyParams.kind     = cudaMemcpyDeviceToDevice;
-    			cutilSafeCall( cudaMemcpy3D(&copyParams) );
-    			cutilSafeCall(cudaBindTextureToArray(d_im_move_tex, d_im_move_array));
+    			checkCudaErrors( cudaMemcpy3D(&copyParams) );
+    			checkCudaErrors(cudaBindTextureToArray(d_im_move_tex, d_im_move_array));
 
 		
 //	update vector flow
@@ -355,29 +355,29 @@ void compute(float *d_im_move, float *d_im_static, float *d_mv_x, float *d_mv_y,
     			copyParams_x.dstArray = d_mv_x_array;
     			copyParams_x.extent   = volumeSize;
     			copyParams_x.kind     = cudaMemcpyDeviceToDevice;
-    			cutilSafeCall( cudaMemcpy3D(&copyParams_x) );
-			cutilSafeCall(cudaBindTextureToArray(d_mv_x_tex, d_mv_x_array));
+    			checkCudaErrors( cudaMemcpy3D(&copyParams_x) );
+			checkCudaErrors(cudaBindTextureToArray(d_mv_x_tex, d_mv_x_array));
 
 			cudaMemcpy3DParms copyParams_y = {0};
     			copyParams_y.srcPtr   = make_cudaPitchedPtr((void*)d_mv_y, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     			copyParams_y.dstArray = d_mv_y_array;
     			copyParams_y.extent   = volumeSize;
     			copyParams_y.kind     = cudaMemcpyDeviceToDevice;
-    			cutilSafeCall( cudaMemcpy3D(&copyParams_y) );
-			cutilSafeCall(cudaBindTextureToArray(d_mv_y_tex, d_mv_y_array));
+    			checkCudaErrors( cudaMemcpy3D(&copyParams_y) );
+			checkCudaErrors(cudaBindTextureToArray(d_mv_y_tex, d_mv_y_array));
 
 			cudaMemcpy3DParms copyParams_z = {0};
     			copyParams_z.srcPtr   = make_cudaPitchedPtr((void*)d_mv_z, volumeSize.width*sizeof(float), volumeSize.width, volumeSize.height);
     			copyParams_z.dstArray = d_mv_z_array;
     			copyParams_z.extent   = volumeSize;
     			copyParams_z.kind     = cudaMemcpyDeviceToDevice;
-    			cutilSafeCall( cudaMemcpy3D(&copyParams_z) );
-			cutilSafeCall(cudaBindTextureToArray(d_mv_z_tex, d_mv_z_array));
+    			checkCudaErrors( cudaMemcpy3D(&copyParams_z) );
+			checkCudaErrors(cudaBindTextureToArray(d_mv_z_tex, d_mv_z_array));
 	
 
-			cutilSafeCall( cudaMemset(d_mv_x, 0, sDATA_SIZE) );
-			cutilSafeCall( cudaMemset(d_mv_y, 0, sDATA_SIZE) );
-			cutilSafeCall( cudaMemset(d_mv_z, 0, sDATA_SIZE) );
+			checkCudaErrors( cudaMemset(d_mv_x, 0, sDATA_SIZE) );
+			checkCudaErrors( cudaMemset(d_mv_y, 0, sDATA_SIZE) );
+			checkCudaErrors( cudaMemset(d_mv_z, 0, sDATA_SIZE) );
 
 
 			
@@ -402,8 +402,8 @@ void compute(float *d_im_move, float *d_im_static, float *d_mv_x, float *d_mv_y,
     		copyParams.dstArray = d_im_move_array;
     		copyParams.extent   = volumeSize;
     		copyParams.kind     = cudaMemcpyDeviceToDevice;
-    		cutilSafeCall( cudaMemcpy3D(&copyParams) );
-    		cutilSafeCall(cudaBindTextureToArray(d_im_move_tex, d_im_move_array));
+    		checkCudaErrors( cudaMemcpy3D(&copyParams) );
+    		checkCudaErrors(cudaBindTextureToArray(d_im_move_tex, d_im_move_array));
 
 		ImageWarp_final<<<nblocks, NTHREAD_PER_BLOCK>>>(d_mv_x, d_mv_y, d_mv_z,d_im_move, NX, NY, NZ);
 		

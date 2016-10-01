@@ -107,11 +107,11 @@ void initData()
 
 //	create image pyramid on device
 //		finest level 0
-	cutilSafeCall( cudaMalloc((void**) &d_im_move[0], DATA_SIZE ) );
-	cutilSafeCall( cudaMalloc((void**) &d_im_static[0],DATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void**) &d_im_move[0], DATA_SIZE ) );
+	checkCudaErrors( cudaMalloc((void**) &d_im_static[0],DATA_SIZE) );
 
-	cutilSafeCall( cudaMemcpy(d_im_static[0], h_im_static, DATA_SIZE, cudaMemcpyHostToDevice) );
-	cutilSafeCall( cudaMemcpy(d_im_move[0], h_im_move, DATA_SIZE, cudaMemcpyHostToDevice) );
+	checkCudaErrors( cudaMemcpy(d_im_static[0], h_im_static, DATA_SIZE, cudaMemcpyHostToDevice) );
+	checkCudaErrors( cudaMemcpy(d_im_move[0], h_im_move, DATA_SIZE, cudaMemcpyHostToDevice) );
 
 	
 	free(h_im_static);
@@ -124,13 +124,13 @@ void initData()
 
 	
 //		vector flow
-	cutilSafeCall( cudaMalloc((void **)&d_mv_x[0], DATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_mv_y[0], DATA_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_mv_z[0], DATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_mv_x[0], DATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_mv_y[0], DATA_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_mv_z[0], DATA_SIZE) );
 
-	cutilSafeCall( cudaMemset(d_mv_x[0], 0, DATA_SIZE) );
-	cutilSafeCall( cudaMemset(d_mv_y[0], 0, DATA_SIZE) );
-	cutilSafeCall( cudaMemset(d_mv_z[0], 0, DATA_SIZE) );
+	checkCudaErrors( cudaMemset(d_mv_x[0], 0, DATA_SIZE) );
+	checkCudaErrors( cudaMemset(d_mv_y[0], 0, DATA_SIZE) );
+	checkCudaErrors( cudaMemset(d_mv_z[0], 0, DATA_SIZE) );
 
 
 //		coarse levels
@@ -142,8 +142,8 @@ void initData()
 
 		sDATA_SIZE = sizeof(float)*NX*NY*NZ;
 
-		cutilSafeCall( cudaMalloc((void**) &d_im_move[scale],   sDATA_SIZE ) );
-		cutilSafeCall( cudaMalloc((void**) &d_im_static[scale], sDATA_SIZE ) );
+		checkCudaErrors( cudaMalloc((void**) &d_im_move[scale],   sDATA_SIZE ) );
+		checkCudaErrors( cudaMalloc((void**) &d_im_static[scale], sDATA_SIZE ) );
 
 		nblocks.x = NBLOCKX;
         	nblocks.y =  ((1 + (NX*NY*NZ - 1)/NTHREAD_PER_BLOCK) - 1) / NBLOCKX + 1; 
@@ -153,13 +153,13 @@ void initData()
 		downSample<<<nblocks, NTHREAD_PER_BLOCK>>>(d_im_move[0], d_im_move[scale], NX, NY, NZ, s);
 		downSample<<<nblocks, NTHREAD_PER_BLOCK>>>(d_im_static[0], d_im_static[scale],NX, NY, NZ, s);
 
-		cutilSafeCall( cudaMalloc((void **)&d_mv_x[scale], sDATA_SIZE ) );
-		cutilSafeCall( cudaMalloc((void **)&d_mv_y[scale], sDATA_SIZE ) );
-		cutilSafeCall( cudaMalloc((void **)&d_mv_z[scale], sDATA_SIZE ) );
+		checkCudaErrors( cudaMalloc((void **)&d_mv_x[scale], sDATA_SIZE ) );
+		checkCudaErrors( cudaMalloc((void **)&d_mv_y[scale], sDATA_SIZE ) );
+		checkCudaErrors( cudaMalloc((void **)&d_mv_z[scale], sDATA_SIZE ) );
 
-		cutilSafeCall( cudaMemset(d_mv_x[scale], 0, sDATA_SIZE ) );
-		cutilSafeCall( cudaMemset(d_mv_y[scale], 0, sDATA_SIZE ) );
-		cutilSafeCall( cudaMemset(d_mv_z[scale], 0, sDATA_SIZE ) );
+		checkCudaErrors( cudaMemset(d_mv_x[scale], 0, sDATA_SIZE ) );
+		checkCudaErrors( cudaMemset(d_mv_y[scale], 0, sDATA_SIZE ) );
+		checkCudaErrors( cudaMemset(d_mv_z[scale], 0, sDATA_SIZE ) );
 		
 
 	}
@@ -170,11 +170,11 @@ void initData()
 
 
 //	allocate space for histogram related variables
-	cutilSafeCall( cudaMalloc(&d_jointHistogram, HIST_SIZE) );
-	cutilSafeCall( cudaMalloc(&d_jointHistogram_conv, HIST_SIZE) );
-	cutilSafeCall( cudaMalloc((void **)&d_probx, sizeof(float)*nBin) );
-	cutilSafeCall( cudaMalloc((void **)&d_proby, sizeof(float)*nBin) );
-	cutilSafeCall( cudaMalloc((void **)&d_Bsum,sizeof(float)*nBin ) );
+	checkCudaErrors( cudaMalloc(&d_jointHistogram, HIST_SIZE) );
+	checkCudaErrors( cudaMalloc(&d_jointHistogram_conv, HIST_SIZE) );
+	checkCudaErrors( cudaMalloc((void **)&d_probx, sizeof(float)*nBin) );
+	checkCudaErrors( cudaMalloc((void **)&d_proby, sizeof(float)*nBin) );
+	checkCudaErrors( cudaMalloc((void **)&d_Bsum,sizeof(float)*nBin ) );
 	
 }
 
@@ -187,8 +187,8 @@ void initGaussKernel()
 	cout <<	"Initializing Gaussian kernel..." << endl;
 	float *h_GaussKernelH  = (float *)malloc(sizeof(float)*(6*hValue+1)*(6*hValue+1));
 	float *h_GaussKernelHx = (float *)malloc(sizeof(float)*(6*hValue+1)*(6*hValue+1));
-	cutilSafeCall( cudaMalloc(&GaussKernelH, sizeof(float)*(6*hValue+1)*(6*hValue+1) ) );
-	cutilSafeCall( cudaMalloc(&GaussKernelHx, sizeof(float)*(6*hValue+1)*(6*hValue+1) ) );
+	checkCudaErrors( cudaMalloc(&GaussKernelH, sizeof(float)*(6*hValue+1)*(6*hValue+1) ) );
+	checkCudaErrors( cudaMalloc(&GaussKernelHx, sizeof(float)*(6*hValue+1)*(6*hValue+1) ) );
 	
 
 	float sum = 0.0;
@@ -214,8 +214,8 @@ void initGaussKernel()
                 }
         }	
 
-	cutilSafeCall( cudaMemcpy(GaussKernelH,  h_GaussKernelH,  sizeof(float)*(6*hValue+1)*(6*hValue+1), cudaMemcpyHostToDevice) );
-	cutilSafeCall( cudaMemcpy(GaussKernelHx, h_GaussKernelHx, sizeof(float)*(6*hValue+1)*(6*hValue+1), cudaMemcpyHostToDevice) );
+	checkCudaErrors( cudaMemcpy(GaussKernelH,  h_GaussKernelH,  sizeof(float)*(6*hValue+1)*(6*hValue+1), cudaMemcpyHostToDevice) );
+	checkCudaErrors( cudaMemcpy(GaussKernelHx, h_GaussKernelHx, sizeof(float)*(6*hValue+1)*(6*hValue+1), cudaMemcpyHostToDevice) );
 	
 	
 
