@@ -285,8 +285,7 @@ void ImageSmooth(float *d_image, float *d_image_conv, int3 Dims)
 	cudaMemset((void*)d_image_conv, 0, SDATA_SIZE);
 	for (int nF = 0; nF < DATA_F; nF++){
 		convolutionRowGPU_byframe<<<blockGridRows, threadBlockRows>>>(d_image_conv, d_image,DATA_W, DATA_H, nF);
-		//checkCudaErrors("convolutionRowGPU() execution failed\n");
-		fprintf(stderr, "convolutionRowGPU() execution failed\n");
+		getLastCudaError("convolutionRowGPU() execution failed\n");
 	}
     
 	//column convolution
@@ -296,8 +295,7 @@ void ImageSmooth(float *d_image, float *d_image_conv, int3 Dims)
     for (int nF = 0; nF < DATA_F; nF++){
         convolutionColumnGPU<<<blockGridColumns, threadBlockColumns>>>
 	         (d_temp, d_image_conv, DATA_W, DATA_H, COLUMN_TILE_W * threadBlockColumns.y,DATA_W * threadBlockColumns.y,nF);
-		//checkCudaErrors("convolutionColumnGPU() execution failed\n"); 
-		fprintf(stderr, "convolutionColumnGPU() execution failed\n");
+		getLastCudaError("convolutionColumnGPU() execution failed\n"); 
     } 
     
     // frame convolution
@@ -306,8 +304,7 @@ void ImageSmooth(float *d_image, float *d_image_conv, int3 Dims)
 	cudaMemset((void*)d_image_conv, 0, SDATA_SIZE);
     convolutionFrameGPU<<<blockGridFrames, threadBlockFrames>>>
        (d_image_conv, d_temp, DATA_W *DATA_H, DATA_F, COLUMN_TILE_W * threadBlockFrames.y,DATA_W*DATA_H * threadBlockFrames.y);
-    //checkCudaErrors("convolutionFrameGPU() execution failed\n");
-    fprintf(stderr, "convolutionFrameGPU() execution failed\n");
+    getLastCudaError("convolutionFrameGPU() execution failed\n");
     
 	
 	cudaFree(d_temp);
